@@ -18,13 +18,12 @@ pipeline {
                 }
             }
         }
-        stage('Operation without SCM'){
-           steps{
-               mail (to: 'pradeep.duraimarudhakutty@wipro.com',
-               subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) is waiting for input",
-               body: "Please go to ${env.BUILD_URL}.");
-                }
-           }
+      stage('Checkstyle') {
+       steps {
+        sh 'vendor/bin/phpcs --report=checkstyle --report-file=`pwd`/build/logs/checkstyle.xml --standard=PSR2 --extensions=php --ignore=autoload.php --ignore=vendor/ . || exit 0'
+        checkstyle pattern: 'build/logs/checkstyle.xml'
+        }
+      }  
         stage ('Deploy to Staging'){
             steps {
                 build job: 'Deploy to staging'
